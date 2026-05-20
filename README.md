@@ -4,7 +4,7 @@ A Laravel API for managing subscription billing workflows. The project is set up
 
 ## Tech Stack
 
-- PHP 8.3+
+- PHP 8.4+
 - Laravel 13
 - Laravel Sail
 - Laravel Passport OAuth2
