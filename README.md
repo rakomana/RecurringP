@@ -220,7 +220,22 @@ https://recurringp-main-lpmv55.laravel.cloud
 After deployment, make sure the Laravel Cloud environment variables are configured, including database credentials, Passport keys/client setup, and:
 
 ```dotenv
+DB_CONNECTION=mysql
+DB_HOST=<laravel-cloud-database-host>
+DB_PORT=3306
+DB_DATABASE=<database-name>
+DB_USERNAME=<database-user>
+DB_PASSWORD=<database-password>
 SCRAMBLE_DOCS_PUBLIC=true
+```
+
+Run production migrations after configuring the database:
+
+```bash
+php artisan migrate --force
+php artisan passport:keys --force
+php artisan passport:client --personal
+php artisan config:clear
 ```
 
 ## License
