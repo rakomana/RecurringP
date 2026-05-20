@@ -11,6 +11,7 @@ class PaymentAttempt extends Model
     use HasFactory;
 
     protected $fillable = [
+        'company_id',
         'payment_id',
         'invoice_id',
         'provider',
@@ -40,5 +41,10 @@ class PaymentAttempt extends Model
     public function invoice(): BelongsTo
     {
         return $this->belongsTo(Invoice::class);
+    }
+
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class);
     }
 }

@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('usage_records', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->constrained()->cascadeOnDelete();
             $table->foreignId('subscription_id')->constrained()->cascadeOnDelete();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('metric');
@@ -21,6 +22,7 @@ return new class extends Migration
             $table->json('metadata')->nullable();
             $table->timestamps();
 
+            $table->index(['company_id', 'metric']);
             $table->index(['subscription_id', 'metric']);
         });
     }

@@ -11,21 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('plans', function (Blueprint $table) {
+        Schema::create('companies', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_id')->constrained()->cascadeOnDelete();
             $table->string('name');
-            $table->string('slug');
-            $table->text('description')->nullable();
-            $table->unsignedInteger('amount');
-            $table->string('currency', 3)->default('USD');
-            $table->string('billing_interval')->default('month');
-            $table->unsignedInteger('trial_days')->default(0);
+            $table->string('slug')->unique();
+            $table->string('email')->nullable();
+            $table->string('phone')->nullable();
+            $table->string('default_currency', 3)->default('USD');
+            $table->string('timezone')->default('UTC');
             $table->boolean('is_active')->default(true);
+            $table->json('billing_settings')->nullable();
             $table->json('metadata')->nullable();
             $table->timestamps();
-
-            $table->unique(['company_id', 'slug']);
         });
     }
 
@@ -34,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('plans');
+        Schema::dropIfExists('companies');
     }
 };

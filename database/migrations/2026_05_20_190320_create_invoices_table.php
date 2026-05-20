@@ -13,9 +13,10 @@ return new class extends Migration
     {
         Schema::create('invoices', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->constrained()->cascadeOnDelete();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('subscription_id')->nullable()->constrained()->nullOnDelete();
-            $table->string('number')->unique();
+            $table->string('number');
             $table->string('status')->default('draft');
             $table->unsignedInteger('subtotal');
             $table->unsignedInteger('tax')->default(0);
@@ -27,6 +28,8 @@ return new class extends Migration
             $table->json('metadata')->nullable();
             $table->timestamps();
 
+            $table->unique(['company_id', 'number']);
+            $table->index(['company_id', 'status']);
             $table->index(['user_id', 'status']);
         });
     }

@@ -1,21 +1,20 @@
 # Subscription Billing API
 
-A Laravel API for managing subscription billing workflows. The project is set up with Laravel Sail, MySQL, Vite, PHPUnit, and the standard Laravel application structure.
+A Laravel API for managing subscription billing workflows. The project is set up with Laravel Sail, MySQL, Laravel Passport OAuth authentication, PHPUnit, and API resource controllers.
 
 ## Tech Stack
 
 - PHP 8.3+
 - Laravel 13
 - Laravel Sail
+- Laravel Passport OAuth2
 - MySQL 8.4
 - PHPUnit
-- Vite / Tailwind CSS
 
 ## Requirements
 
 - Docker Desktop
 - Composer
-- Node.js and npm
 
 ## Getting Started With Sail
 
@@ -60,17 +59,17 @@ Run database migrations:
 ./vendor/bin/sail artisan migrate
 ```
 
-Install frontend dependencies and build assets:
+Set up Laravel Passport OAuth keys and create a personal access client:
 
 ```bash
-./vendor/bin/sail npm install
-./vendor/bin/sail npm run build
+./vendor/bin/sail artisan passport:keys
+./vendor/bin/sail artisan passport:client --personal
 ```
 
-The application will be available at:
+The API will be available at:
 
 ```text
-http://localhost
+http://localhost/api
 ```
 
 ## Common Commands
@@ -111,16 +110,11 @@ Run Laravel Pint:
 ./vendor/bin/sail pint
 ```
 
-Run the Vite development server:
-
-```bash
-./vendor/bin/sail npm run dev
-```
-
 ## API Scope
 
 This project is intended to support subscription billing features such as:
 
+- Companies / tenants
 - Customers
 - Plans and pricing
 - Subscriptions
@@ -128,7 +122,33 @@ This project is intended to support subscription billing features such as:
 - Payments
 - Billing events and status changes
 
-API routes should be added in Laravel's route files as the billing features are implemented.
+Billing resources are scoped by `company_id` so the API can support multiple companies using the same application.
+
+API routes are registered in `routes/api.php`.
+
+## Authentication
+
+The API uses the `laravel/passport` package for OAuth2 bearer token authentication. Login and registration return an access token that clients must send with protected API requests.
+
+Open endpoints:
+
+```text
+POST /api/auth/register
+POST /api/auth/login
+```
+
+Protected endpoints require this header:
+
+```text
+Authorization: Bearer <access_token>
+```
+
+Authenticated endpoints:
+
+```text
+GET  /api/auth/me
+POST /api/auth/logout
+```
 
 ## Project Structure
 
@@ -137,7 +157,6 @@ app/          Application code
 config/       Laravel configuration
 database/     Migrations, factories, and seeders
 public/       Public entry point
-resources/    Frontend assets and views
 routes/       Application routes
 tests/        Feature and unit tests
 ```

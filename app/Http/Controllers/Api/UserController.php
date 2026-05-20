@@ -3,34 +3,41 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UserRequest;
 use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
     public function index()
     {
-        return User::query()->latest()->paginate();
+        return User::query()->with('companies')->latest()->paginate();
     }
 
-    public function store(Request $request)
+    public function store(UserRequest $request)
     {
-        $user = User::create($this->validatedData($request));
+        $user = User::create($request->safe()->except('company_ids'));
 
-        return response()->json($user, 201);
+        if ($request->filled('company_ids')) {
+            $user->companies()->sync($this->membershipPayload($request->validated('company_ids')));
+        }
+
+        return response()->json($user->load('companies'), 201);
     }
 
     public function show(User $user)
     {
-        return $user->load(['subscriptions', 'invoices', 'payments', 'usageRecords']);
+        return $user->load(['companies', 'subscriptions', 'invoices', 'payments', 'usageRecords']);
     }
 
-    public function update(Request $request, User $user)
+    public function update(UserRequest $request, User $user)
     {
-        $user->update($this->validatedData($request, $user));
+        $user->update($request->safe()->except('company_ids'));
 
-        return $user->fresh();
+        if ($request->has('company_ids')) {
+            $user->companies()->sync($this->membershipPayload($request->validated('company_ids', [])));
+        }
+
+        return $user->fresh()->load('companies');
     }
 
     public function destroy(User $user)
@@ -40,12 +47,10 @@ class UserController extends Controller
         return response()->noContent();
     }
 
-    private function validatedData(Request $request, ?User $user = null): array
+    private function membershipPayload(array $companyIds): array
     {
-        return $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user)],
-            'password' => [$user ? 'sometimes' : 'required', 'string', 'min:8'],
-        ]);
+        return collect($companyIds)
+            ->mapWithKeys(fn (int $companyId) => [$companyId => ['role' => 'member']])
+            ->all();
     }
 }

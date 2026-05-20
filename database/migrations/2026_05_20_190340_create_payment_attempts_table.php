@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('payment_attempts', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->constrained()->cascadeOnDelete();
             $table->foreignId('payment_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('invoice_id')->constrained()->cascadeOnDelete();
             $table->string('provider')->default('manual');
@@ -25,6 +26,7 @@ return new class extends Migration
             $table->json('response_payload')->nullable();
             $table->timestamps();
 
+            $table->index(['company_id', 'status']);
             $table->index(['invoice_id', 'status']);
         });
     }

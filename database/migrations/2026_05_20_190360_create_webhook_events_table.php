@@ -13,14 +13,17 @@ return new class extends Migration
     {
         Schema::create('webhook_events', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->constrained()->cascadeOnDelete();
             $table->string('provider');
-            $table->string('event_id')->unique();
+            $table->string('event_id');
             $table->string('event_type');
             $table->string('status')->default('pending');
             $table->json('payload');
             $table->timestamp('processed_at')->nullable();
             $table->timestamps();
 
+            $table->unique(['company_id', 'event_id']);
+            $table->index(['company_id', 'status']);
             $table->index(['provider', 'status']);
         });
     }
