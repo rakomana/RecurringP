@@ -162,10 +162,10 @@ GET /docs/api.json
 
 Scramble is configured in `app/Providers/AppServiceProvider.php` to document routes under `/api` and include bearer token authentication in the OpenAPI schema.
 
-In deployed environments, Scramble protects the docs by default. To make the docs public, set:
+The docs are public by default. To restrict docs in a deployed environment, set:
 
 ```dotenv
-SCRAMBLE_DOCS_PUBLIC=true
+SCRAMBLE_DOCS_PUBLIC=false
 ```
 
 After changing this value in production, clear the config cache:
@@ -217,7 +217,11 @@ The application is deployed to Laravel Cloud:
 https://recurringp-main-lpmv55.laravel.cloud
 ```
 
-After deployment, make sure the Laravel Cloud environment variables are configured, including database credentials, Passport keys/client setup, and:
+For a quick Laravel Cloud deployment without changing environment variables, the app falls back to SQLite and includes `database/database.sqlite` so deploy-time migrations can run.
+
+If Laravel Cloud provides default MySQL values like `DB_HOST=127.0.0.1`, the app will still fall back to SQLite because there is no MySQL server inside the application container.
+
+For a production deployment, attach a managed database in Laravel Cloud and configure the database environment variables:
 
 ```dotenv
 DB_CONNECTION=mysql
@@ -226,10 +230,11 @@ DB_PORT=3306
 DB_DATABASE=<database-name>
 DB_USERNAME=<database-user>
 DB_PASSWORD=<database-password>
-SCRAMBLE_DOCS_PUBLIC=true
 ```
 
-Run production migrations after configuring the database:
+Only use MySQL when `DB_HOST` points to a real managed database host.
+
+Run deploy commands after the database choice is configured:
 
 ```bash
 php artisan migrate --force

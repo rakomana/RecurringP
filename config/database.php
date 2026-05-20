@@ -3,6 +3,17 @@
 use Illuminate\Support\Str;
 use Pdo\Mysql;
 
+$configuredConnection = env('DB_CONNECTION', 'sqlite');
+$configuredHost = env('DB_HOST', '127.0.0.1');
+
+$defaultConnection = $configuredConnection === 'mysql' && in_array($configuredHost, ['127.0.0.1', 'localhost'], true)
+    ? 'sqlite'
+    : $configuredConnection;
+
+$sqliteDatabase = $defaultConnection === 'sqlite' && $configuredConnection !== 'sqlite'
+    ? database_path('database.sqlite')
+    : env('DB_DATABASE', database_path('database.sqlite'));
+
 return [
 
     /*
@@ -17,7 +28,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'mysql'),
+    'default' => $defaultConnection,
 
     /*
     |--------------------------------------------------------------------------
@@ -35,7 +46,7 @@ return [
         'sqlite' => [
             'driver' => 'sqlite',
             'url' => env('DB_URL'),
-            'database' => env('DB_DATABASE', database_path('database.sqlite')),
+            'database' => $sqliteDatabase,
             'prefix' => '',
             'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
             'busy_timeout' => null,
