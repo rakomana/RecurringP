@@ -1,6 +1,6 @@
 # Subscription Billing API
 
-A Laravel API for managing subscription billing workflows. The project is set up with Laravel Sail, MySQL, Laravel Passport OAuth authentication, PHPUnit, and API resource controllers.
+A Laravel API for managing subscription billing workflows. The project is set up with Laravel Sail, MySQL, Laravel Passport OAuth authentication, Laravel Scramble API documentation, PHPUnit, and API resource controllers.
 
 ## Tech Stack
 
@@ -8,6 +8,7 @@ A Laravel API for managing subscription billing workflows. The project is set up
 - Laravel 13
 - Laravel Sail
 - Laravel Passport OAuth2
+- Laravel Scramble OpenAPI docs
 - MySQL 8.4
 - PHPUnit
 
@@ -150,6 +151,29 @@ GET  /api/auth/me
 POST /api/auth/logout
 ```
 
+## API Documentation
+
+The API documentation is generated with the `dedoc/scramble` package.
+
+```text
+GET /docs/api
+GET /docs/api.json
+```
+
+Scramble is configured in `app/Providers/AppServiceProvider.php` to document routes under `/api` and include bearer token authentication in the OpenAPI schema.
+
+In deployed environments, Scramble protects the docs by default. To make the docs public, set:
+
+```dotenv
+SCRAMBLE_DOCS_PUBLIC=true
+```
+
+After changing this value in production, clear the config cache:
+
+```bash
+php artisan config:clear
+```
+
 ## Project Structure
 
 ```text
@@ -173,6 +197,30 @@ You can also run Laravel's test command directly:
 
 ```bash
 ./vendor/bin/sail artisan test
+```
+
+## CI/CD
+
+This project uses GitHub Actions for CI. The workflow is defined in `.github/workflows/ci.yml` and runs on pushes to `main` / `master` and on pull requests.
+
+The pipeline:
+
+- Sets up PHP 8.4
+- Installs Composer dependencies
+- Prepares the Laravel environment
+- Generates Passport keys
+- Runs the test suite
+
+The application is deployed to Laravel Cloud:
+
+```text
+https://recurringp-main-lpmv55.laravel.cloud
+```
+
+After deployment, make sure the Laravel Cloud environment variables are configured, including database credentials, Passport keys/client setup, and:
+
+```dotenv
+SCRAMBLE_DOCS_PUBLIC=true
 ```
 
 ## License

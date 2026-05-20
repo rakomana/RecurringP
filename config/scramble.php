@@ -129,7 +129,7 @@ return [
 
     'middleware' => [
         'web',
-        RestrictedDocsAccess::class,
+        ...env('SCRAMBLE_DOCS_PUBLIC', false) ? [] : [RestrictedDocsAccess::class],
     ],
 
     'extensions' => [],
